@@ -1,9 +1,31 @@
-<article aria-label="">
+<article class="calculation--container" aria-label="">
+
+  <form class="form--search--journey">
+    <!-- Grid -->
+    <div class="grid">
+      <!-- Markup example 1: input is inside label -->
+      <label for="firstname">
+        Lieu de départ
+        <input type="search" id="firstname" name="firstname" placeholder="Lieu de départ" required>
+      </label>
+
+      <label for="lastname">
+        Lieu d'arrivée
+        <input type="search" id="lastname" name="lastname" placeholder="Lieu d'arrivée" required>
+      </label>
+      <button class="form--search--journey-submitButton" type="submit">🔍</button>
+    </div>
+
+    <!-- Markup example 2: input is after label -->
+    <small>yusscode</small>
+
+    <!-- Button -->
+
+  </form>
 
   <app-map></app-map>
     <div *ngIf="resultat">
         <hr>
         <p>Resultat : {{ resultat }}</p>
     </div>
-
 </article>

@@ -1,14 +1,22 @@
 /* Customization */
-@media only screen and (min-width: 768px) {
-    article {
-        margin: var(--block-spacing-vertical) 3%;
+
+.navbar--container {
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
+
+  .navbar--li-appIcon {
+    img {
+      padding-left: 50px;
     }
+  }
+
 }
+
 .leaflet-control-zoom-in span {
-    position: absolute;
-    top: 0;
-    left: 8px;
+  position: absolute;
+  top: 0;
+  left: 8px;
 }
+
 .leaflet-control-zoom-out span {
   position: absolute;
   top: 30px;
@@ -17,15 +25,18 @@
 }
 
 :root {
-    --font-size: 1rm;
-    --spacing: 0.5rem;
+  --font-size: 1 rm;
+  --spacing: 0.5rem;
 
-    h1 {
-        --typography-spacing-vertical: 1.5rem;
-    }
+  h1 {
+    --typography-spacing-vertical: 1.5rem;
+  }
 
-    form {
-        margin-bottom: 0;
-    }
-
+  form {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+  }
 }
+
+

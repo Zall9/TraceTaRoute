@@ -10,10 +10,13 @@ import { SoapCalculService } from 'src/app/services/soap-calcul.service';
 })
 export class CalculComponent implements OnInit {
 
-  distance!: number;
-  vitesse!: number;
+ vitesseMoyenne!: number;
+ lat1!: number;
+  lon1!: number;
+  lat2!: number;
+  lon2!: number;
   autonomie!: number;
-  recharge!: number;
+  tempsRechargeMin!: number;
 
   resultat!: number;
 
