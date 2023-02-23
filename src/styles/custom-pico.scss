@@ -1,10 +1,20 @@
 /* Customization */
 @media only screen and (min-width: 768px) {
     article {
-        margin: var(--block-spacing-vertical) 30%;
+        margin: var(--block-spacing-vertical) 3%;
     }
 }
+.leaflet-control-zoom-in span {
+    position: absolute;
+    top: 0;
+    left: 8px;
+}
+.leaflet-control-zoom-out span {
+  position: absolute;
+  top: 30px;
+  left: 8px;
 
+}
 
 :root {
     --font-size: 1rm;
@@ -17,4 +27,5 @@
     form {
         margin-bottom: 0;
     }
-}  
+
+}

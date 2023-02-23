@@ -6,11 +6,13 @@ import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { CalculComponent } from './components/calcul/calcul.component';
 import { FormsModule } from '@angular/forms';
+import { MapComponent } from './components/map/map.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    CalculComponent
+    CalculComponent,
+    MapComponent
   ],
   imports: [
     BrowserModule,
