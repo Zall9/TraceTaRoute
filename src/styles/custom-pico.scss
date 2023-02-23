@@ -1,0 +1,20 @@
+/* Customization */
+@media only screen and (min-width: 768px) {
+    article {
+        margin: var(--block-spacing-vertical) 30%;
+    }
+}
+
+
+:root {
+    --font-size: 1rm;
+    --spacing: 0.5rem;
+
+    h1 {
+        --typography-spacing-vertical: 1.5rem;
+    }
+
+    form {
+        margin-bottom: 0;
+    }
+}  
