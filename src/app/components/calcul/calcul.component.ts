@@ -20,11 +20,13 @@ export class CalculComponent implements OnInit {
 
   resultat!: number;
 
+  listOfPlaces!:string[];
   constructor(private soapCalcul: SoapCalculService) { }
   ngOnInit(): void {
     this.soapCalcul.calculDuration(60,45.7603831,4.849664,43.3,5.4,400.0,35.5).pipe(
       map(value => this.resultat = value)
     ).subscribe();
+    this.listOfPlaces=['Lyon','Paris','Marseille'];
   }
 
 

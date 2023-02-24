@@ -4,14 +4,21 @@
     <!-- Grid -->
     <div class="grid">
       <!-- Markup example 1: input is inside label -->
-      <label for="firstname">
+      <label class="form--search--journey-label" for="firstname" >
         Lieu de départ
         <input type="search" id="firstname" name="firstname" placeholder="Lieu de départ" required>
+        <div class="form--search--journey-label-content" *ngFor="let place of listOfPlaces">
+          <ul><p>{{ place | titlecase }}</p></ul>
+        </div>
       </label>
 
-      <label for="lastname">
+      <label class="form--search--journey-label" for="lastname">
         Lieu d'arrivée
         <input type="search" id="lastname" name="lastname" placeholder="Lieu d'arrivée" required>
+        <div class="form--search--journey-label-content" *ngFor="let place of listOfPlaces">
+          <ul><p>{{ place | titlecase }}</p></ul>
+        </div>
+
       </label>
       <button class="form--search--journey-submitButton" type="submit">🔍</button>
     </div>

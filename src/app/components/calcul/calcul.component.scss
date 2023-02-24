@@ -12,7 +12,31 @@
 
 }
 .calculation--container{
+  /* From https://css.glass */
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+.form--search--journey-label{
+  color:#121212;
+  input{
+    color:#121212;
+  }
+  input::placeholder{
+    color:#393939;
+  }
 
 }
+.form--search--journey-label-content {
+  display: none;
+  p{
+    color:#121212;
+  }
+}
 
-
+.form--search--journey-label:focus-within .form--search--journey-label-content {
+  display: block;
+}
