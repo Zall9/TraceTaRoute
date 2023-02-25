@@ -22,6 +22,8 @@
 }
 .form--search--journey-label{
   color:#121212;
+  z-index: 0;
+  position: relative;
   input{
     color:#121212;
   }
@@ -30,13 +32,15 @@
   }
 
 }
-.form--search--journey-label-content {
+.form--search--journey-label-content  {
   display: none;
   p{
     color:#121212;
+
   }
+  z-index: 999999;
 }
 
-.form--search--journey-label:focus-within .form--search--journey-label-content {
+.form--search--journey-label:focus-within .form--search--journey-label-content{
   display: block;
 }

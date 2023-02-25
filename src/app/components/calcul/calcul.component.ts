@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
-import { map, Observable } from 'rxjs';
+import {map, Observable, tap} from 'rxjs';
 import { SoapCalculService } from 'src/app/services/soap-calcul.service';
+import {ReloadPlugsService} from "../../services/reload-plugs.service";
 
 @Component({
   selector: 'app-calcul',
@@ -21,12 +22,20 @@ export class CalculComponent implements OnInit {
   resultat!: number;
 
   listOfPlaces!:string[];
-  constructor(private soapCalcul: SoapCalculService) { }
+  listOfPlugs!:any[];
+  constructor(private soapCalcul: SoapCalculService, private plugsService:ReloadPlugsService) { }
   ngOnInit(): void {
     this.soapCalcul.calculDuration(60,45.7603831,4.849664,43.3,5.4,400.0,35.5).pipe(
       map(value => this.resultat = value)
     ).subscribe();
     this.listOfPlaces=['Lyon','Paris','Marseille'];
+    this.plugsService.getPlugsNearCoordinate(45.75 ,4.85, 10000).pipe(
+      map(value => this.listOfPlugs.push(value))
+    ).subscribe();
+
+    // this.plugsService.getPlugsNearCoordinate(this.plugsService.convertDecimalToDMS(45.7603831),this.plugsService.convertDecimalToDMS(4.849664)).pipe(
+    //   map(value => this.listOfPlugs.push(value))
+    // ).subscribe()
   }
 
 
