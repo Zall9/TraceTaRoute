@@ -1,38 +1,30 @@
 <article class="calculation--container" aria-label="">
 
-  <form class="form--search--journey">
-    <!-- Grid -->
+  <form #f="ngForm" (ngSubmit)="onSubmitForm(f)" class="form--search--journey">
     <div class="grid">
-      <!-- Markup example 1: input is inside label -->
-      <label class="form--search--journey-label" for="firstname" >
+      <label class="form--search--journey-label" for="suggestions">
         Lieu de départ
-        <input type="search" id="firstname" name="firstname" placeholder="Lieu de départ" required>
-        <div class="form--search--journey-label-content" *ngFor="let place of listOfPlaces">
-          <ul><p>{{ place | titlecase }}</p></ul>
-        </div>
+        <datalist *ngFor="let place of this.placesSuggestions"  id="suggestions">
+          <option>{{place}}</option>
+        </datalist>
+        <input (input)="onUserInputArray1($event)" type="search" autoComplete="on" list="suggestions" />
       </label>
 
-      <label class="form--search--journey-label" for="lastname">
+      <label class="form--search--journey-label" for="suggestions2">
         Lieu d'arrivée
-        <input type="search" id="lastname" name="lastname" placeholder="Lieu d'arrivée" required>
-        <div class="form--search--journey-label-content" *ngFor="let place of listOfPlaces">
-          <ul><p>{{ place | titlecase }}</p></ul>
-        </div>
-
+        <datalist *ngFor="let place of this.placesSuggestions2" id="suggestions2">
+          <option>{{place}}</option>
+        </datalist>
+        <input (input)="onUserInputArray2($event)" type="search" autoComplete="on" list="suggestions2" />
       </label>
-      <button class="form--search--journey-submitButton" type="submit">🔍</button>
+
     </div>
-
-    <!-- Markup example 2: input is after label -->
-    <small>yusscode</small>
-
-    <!-- Button -->
-
+    <button class="form--search--journey-submitButton" type="submit">🔍</button>
   </form>
 
-  <app-map></app-map>
-    <div *ngIf="resultat">
-        <hr>
-        <p>Resultat : {{ resultat }}</p>
-    </div>
+  <app-map [lat1]="lat1" [lat2]="lat2" [lon1]="lon1" [lon2]="lon2"></app-map>
+  <div *ngIf="resultat">
+    <hr>
+    <p>Resultat : {{ resultat }}</p>
+  </div>
 </article>

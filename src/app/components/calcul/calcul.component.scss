@@ -43,3 +43,8 @@
 .form--search--journey-label:focus-within .form--search--journey-label-content{
   display: block;
 }
+
+.grid{
+  display:flex;
+  flex-direction: row;
+}
