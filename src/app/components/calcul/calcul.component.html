@@ -4,18 +4,18 @@
     <div class="grid">
       <label class="form--search--journey-label" for="suggestions">
         Lieu de départ
-        <datalist *ngFor="let place of this.placesSuggestions"  id="suggestions">
-          <option>{{place}}</option>
+        <datalist id="suggestions">
+          <option *ngFor="let place of this.placesSuggestions">{{place}}</option>
         </datalist>
-        <input (input)="onUserInputArray1($event)" type="search" autoComplete="on" list="suggestions" />
+        <input (input)="onUserInputArray1($event)"  type="search" autoComplete="on" list="suggestions" />
       </label>
 
       <label class="form--search--journey-label" for="suggestions2">
         Lieu d'arrivée
-        <datalist *ngFor="let place of this.placesSuggestions2" id="suggestions2">
-          <option>{{place}}</option>
+        <datalist id="suggestions2">
+          <option *ngFor="let place of this.placesSuggestions2">{{place}}</option>
         </datalist>
-        <input (input)="onUserInputArray2($event)" type="search" autoComplete="on" list="suggestions2" />
+        <input (input)="onUserInputArray2($event)"  type="search" autoComplete="on" list="suggestions2"  />
       </label>
 
     </div>

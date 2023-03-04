@@ -3,7 +3,8 @@ import {HttpClient} from "@angular/common/http";
 import {map, Observable, pipe, tap} from "rxjs";
 
 
-export const plugServiceURL = "https://odre.opendatasoft.com/api/records/1.0/search/?dataset=bornes-irve"
+export const plugServiceURL = "https://odre.opendatasoft.com/api/records/1.0/search/?dataset=bornes-irve&q=&"
+
 export const CitiesURL = "https://nominatim.openstreetmap.org/"
 @Injectable({
   providedIn: 'root'
@@ -53,5 +54,40 @@ export class ReloadPlugsService {
         return value[0].lat + "," + value[0].lon;
       })
     )
+  }
+
+  getPlugsNearCoordinateSecure(x: number, y: number, distance: number): Observable<any> {
+    return this.http.get(plugServiceURL + "&geofilter.distance=" + x + "%2C" + y + "%2C" + distance).pipe(
+      map((data: any) => {
+        let name = data["records"][0]?.fields.ad_station;
+        let latitude = data["records"][0].geometry.coordinates[1];
+        let longitude = data["records"][0].geometry.coordinates[0];
+        let observations = data["records"][0]?.fields.observations;
+
+        if (latitude === undefined || longitude === undefined || observations === undefined || name === undefined) {
+          throw new Error("Latitude ou longitude indéfinie.");
+        }
+
+        return {name, latitude, longitude, observations};
+      })
+    );
+  }
+
+
+  getGeoCoding(cityName: string): Observable<{ lat: number, lon: number }> {
+    const uri = `${CitiesURL}/search?q=${cityName}&format=json`;
+
+    return this.http.get<any>(uri).pipe(
+      map(value => {
+        return  { lat: value[0].lat, lon: value[0].lon };
+      })
+    );
+  }
+  getBorne(lat: number, lon: number, radius: number): Observable<any[]> {
+    const uri = plugServiceURL + `geofilter.distance=${lat}%2C${lon}%2C${radius}`;
+
+    return this.http.get<any>(uri).pipe(
+      map(value => value.records[0])
+    );
   }
 }

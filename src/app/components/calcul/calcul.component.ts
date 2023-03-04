@@ -1,12 +1,12 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {NgForm} from '@angular/forms';
-import {map} from 'rxjs';
+import {catchError, filter, map, Observable, repeatWhen, take, tap, zip} from 'rxjs';
 import {SoapCalculService} from 'src/app/services/soap-calcul.service';
 import {ReloadPlugsService} from "../../services/reload-plugs.service";
 import {MapComponent} from "../map/map.component";
 import * as L from 'leaflet';
 import 'leaflet-routing-machine';
-import {mark} from "@angular/compiler-cli/src/ngtsc/perf/src/clock";
+
 @Component({
   selector: 'app-calcul',
   templateUrl: './calcul.component.html',
@@ -33,7 +33,14 @@ export class CalculComponent implements OnInit {
 
   listOfPlugs!: any[];
 
+  lengthCoords!: number;
+  latBornes!: number;
+  lonBornes!: number;
+
+  coordinates!: any[];
+  CurrentBorne!: any[];
   @ViewChild(MapComponent) map!: MapComponent;
+
   constructor(private soapCalcul: SoapCalculService, private plugsService: ReloadPlugsService) {
   }
 
@@ -47,6 +54,7 @@ export class CalculComponent implements OnInit {
   }
 
   onUserInputArray1($event: any) {
+    $event.preventDefault();
     this.startCity = $event.target.value;
     this.plugsService.getCities(this.startCity).subscribe(
       (data: any) => {
@@ -56,6 +64,7 @@ export class CalculComponent implements OnInit {
   }
 
   onUserInputArray2(event: any) {
+    event.preventDefault();
     this.endCity = event.target.value;
     this.plugsService.getCities(this.endCity).subscribe(
       (data: any) => {
@@ -65,53 +74,107 @@ export class CalculComponent implements OnInit {
   }
 
 
-  onSubmitForm(form: NgForm) {
+  onSubmitForm(form: { valid: any; }) {
     if (form.valid) {
-      this.plugsService.getCityCoordinates(this.startCity).subscribe(
-        (data: any) => {
-          console.log('DATA: ', data)
-          this.lat1 = data.split(',')[0];
-          this.lon1 = data.split(',')[1];
-          const marker = L.marker([this.lat1, this.lon1]).addTo(this.map.map);
-          marker.bindPopup('Départ: '+this.startCity).openPopup();
-        }
-      );
-      this.plugsService.getCityCoordinates(this.endCity).subscribe(
-        (data: any) => {
-          this.lat2 = data.split(',')[0];
-          this.lon2 = data.split(',')[1];
-          const marker = L.marker([this.lat2, this.lon2]).addTo(this.map.map);
-          marker.bindPopup('Arrivée: '+this.endCity).openPopup();
-          this.map.map.panTo(new L.LatLng(this.lat2, this.lon2));
-          const routingControl = L.Routing.control({
-            waypoints: [
-              L.latLng(this.lat1, this.lon1),
-              L.latLng(this.lat2, this.lon2),
-            ],
-            routeWhileDragging: true,
-            showAlternatives: true,
+      zip(
+        this.plugsService.getGeoCoding(this.startCity),
+        this.plugsService.getGeoCoding(this.endCity)
+      ).pipe(
+        tap(value => {
+          const start = value[0];
+          const dest = value[1];
 
-          }).addTo(this.map.map)
-          //I need to get the geojson from the routing control
-          //and then use it to get the distance
-          //and then use it to get the duration
-          //and then use it to get the number of plugs needed
-          routingControl.on('routesfound', (e: any) => {
-            const routes = e.routes;
-            const distance = routes[0].summary.totalDistance;
-            const duration = routes[0].summary.totalTime;
-            // const plugsNeeded = this.calculatePlugsNeeded(distance, duration);
+          const waypoint1 = new L.LatLng(start.lat, start.lon);
+          const waypoint2 = new L.LatLng(dest.lat, dest.lon);
 
-            //this.soapCalcul.calculDuration(duration, this.lat1, this.lon1, this.lat2, this.lon2, this.autonomie, this.tempsRechargeMin).pipe(
-            console.log('distance: ', distance);
-            console.log('duration: ', duration);
+          this.firstTraceRoute([waypoint1, waypoint2]);
+        })
+      ).subscribe();
 
-
-          });
-
-        }
-      );
-
+    } else {
+      console.log('Formulaire invalide');
     }
+  };
+
+  calculIndexArray(distanceKm: number, autonomy: number, lengthCoords: number) {
+    if (autonomy < distanceKm) {
+      const nbReloads = distanceKm / autonomy;
+      let index = (autonomy * lengthCoords) / distanceKm;
+      index = index - 400;
+      if (index < 0)
+        index = 0;
+      index = Math.floor(index);
+
+      // Tableau index
+      let arrayIndex: any = [];
+      for (let i = 1; i <= nbReloads + 1; i++) {
+        arrayIndex.push(index * i);
+      }
+      return arrayIndex;
+    }
+    return null;
   }
+
+  private firstTraceRoute(waypoints: L.LatLng[]) {
+    const routing = L.Routing.control({
+      waypoints: waypoints
+    }).addTo(this.map.map);
+
+    routing.on('routesfound', (e) => {
+      const distanceKm = e.routes[0].summary.totalDistance / 1000;
+      const coords = e.routes[0].coordinates;
+      const autonomyKm = 100;
+
+      // we calcul when we need electric power
+      let index = this.calculIndexArray(distanceKm, autonomyKm, coords.length);
+
+      // if we need it on the road
+      if (index != null) {
+        const observables: Observable<any>[] = [];
+
+        // for each, we want to find the nearest charging point
+        index.forEach((p: number) => {
+          if (coords[p]) {
+            // we add all the query in an array to send them at the same time
+            observables.push(this.plugsService.getBorne(coords[p].lat, coords[p].lng, 100000));
+          }
+        });
+
+        // send all the query
+        zip(...observables).pipe(
+          tap(value => {
+            // we create a new route form start to dest passing through charging point
+            const newWaypoints: any[] = [];
+            newWaypoints.push(waypoints[0]);
+
+            value.forEach(v => {
+              newWaypoints.push(new L.LatLng(v.fields.ylatitude, v.fields.xlongitude))
+            });
+
+            newWaypoints.push(waypoints[1]);
+
+            // trace new route and delete old route
+            this.secondTraceRoute(newWaypoints, routing);
+          })
+        ).subscribe();
+      }
+    });
+  }
+
+  private secondTraceRoute(waypoints: L.LatLng[], routeToRemove: any) {
+    // trace new route
+    const routing = L.Routing.control({
+      waypoints: waypoints
+    }).addTo(this.map.map);
+
+    // delete old route
+    this.map.map.removeControl(routeToRemove);
+
+    routing.on('routesfound', (e) => {
+      const distanceKm = e.routes[0].summary.totalDistance / 1000;
+
+      console.log('distanceKm : ' + distanceKm);
+    })
+  }
+
 }
