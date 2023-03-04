@@ -48,3 +48,19 @@
   display:flex;
   flex-direction: row;
 }
+
+.calculation--container--soap-result{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: calc(var(--spacing) * 2);
+  h1{
+    font-size: calc(var(--font-size) * 2);
+    color:#121212;
+  }
+  p{
+    font-size: calc(var(--font-size) * 1.5);
+    color:#121212;
+  }
+}

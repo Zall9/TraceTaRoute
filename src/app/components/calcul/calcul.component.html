@@ -31,8 +31,8 @@
   </form>
 
   <app-map [lat1]="lat1" [lat2]="lat2" [lon1]="lon1" [lon2]="lon2"></app-map>
-  <div *ngIf="resultat">
+  <div class="calculation--container--soap-result" *ngIf="resultat">
     <hr>
-    <p>Resultat : {{ resultat }}</p>
+    <p>Temps de Trajet : {{ resultat }}</p>
   </div>
 </article>

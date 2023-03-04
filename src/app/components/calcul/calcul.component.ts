@@ -33,6 +33,13 @@ export class CalculComponent implements OnInit {
   userCar!: string;
   cars !: {id: number, model: string}[];
 
+  pumpIcon = L.icon({
+    iconUrl: 'assets/images/pump.png',
+    iconSize:     [38, 95], // size of the icon
+    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+    shadowAnchor: [4, 62],  // the same for the shadow
+    popupAnchor:  [-3, -76]
+  });
   autonomie!: number;
   @ViewChild(MapComponent) map!: MapComponent;
 
@@ -104,6 +111,9 @@ export class CalculComponent implements OnInit {
           this.autonomie = ~~value[2];
           console.log('VALUE FROM PIPTAP',value[2])
           this.soapCalcul.calculDuration(60,start.lat, start.lon, dest.lat, dest.lon, this.autonomie, 30)
+            .subscribe((data: any) => {
+              this.resultat = data;
+            });
         })
       ).subscribe();
     } else {
@@ -138,7 +148,7 @@ export class CalculComponent implements OnInit {
     routing.on('routesfound', (e) => {
       const distanceKm = e.routes[0].summary.totalDistance / 1000;
       const coords = e.routes[0].coordinates;
-      const autonomyKm = 100;
+      const autonomyKm = this.autonomie;
 
       // we calcul when we need electric power
       let index = this.calculIndexArray(distanceKm, autonomyKm, coords.length);

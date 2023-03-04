@@ -20,11 +20,11 @@ class CalculService(ServiceBase):
         # Calculer le nombre de recharges nécessaires
         nb_recharges = distance_km // distance_max_km
         # Calculer le temps de recharge total
-        temps_recharge_total = nb_recharges * temps_recharge_min
+        temps_recharge_total = 1+ nb_recharges * temps_recharge_min
         # Ajouter le temps de recharge total au temps de trajet
         temps_trajet += temps_recharge_total
         # Retourner le temps de trajet
-        return temps_trajet
+        return (temps_trajet /10 )* 2
 
 
 application = Application([CalculService], 'info.802.calcul.soap',
