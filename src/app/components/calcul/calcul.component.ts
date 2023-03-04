@@ -6,6 +6,7 @@ import {ReloadPlugsService} from "../../services/reload-plugs.service";
 import {MapComponent} from "../map/map.component";
 import * as L from 'leaflet';
 import 'leaflet-routing-machine';
+import {VehiculesListService} from "../../services/vehicules-list.service";
 
 @Component({
   selector: 'app-calcul',
@@ -14,10 +15,9 @@ import 'leaflet-routing-machine';
 })
 export class CalculComponent implements OnInit {
 
-
   placesSuggestions!: any[];
   placesSuggestions2!: any[];
-
+  carsSuggestions!: {id:number,model:string}[];
   startCity!: string;
   endCity!: string;
 
@@ -26,31 +26,22 @@ export class CalculComponent implements OnInit {
   lon1!: number;
   lat2!: number;
   lon2!: number;
-  autonomie!: number;
-  tempsRechargeMin!: number;
 
   resultat!: number;
-
-  listOfPlugs!: any[];
-
-  lengthCoords!: number;
-  latBornes!: number;
-  lonBornes!: number;
-
   coordinates!: any[];
-  CurrentBorne!: any[];
+
+  userCar!: string;
+  cars !: {id: number, model: string}[];
+
+  autonomie!: number;
   @ViewChild(MapComponent) map!: MapComponent;
 
-  constructor(private soapCalcul: SoapCalculService, private plugsService: ReloadPlugsService) {
+  constructor(private vehiculesService: VehiculesListService,private soapCalcul: SoapCalculService, private plugsService: ReloadPlugsService) {
   }
 
   ngOnInit(): void {
-    this.soapCalcul.calculDuration(60, 45.7603831, 4.849664, 43.3, 5.4, 400.0, 35.5).pipe(
-      map(value => this.resultat = value)
-    ).subscribe();
-    this.plugsService.getPlugsNearCoordinate(45.75, 4.85, 10000).pipe(
-      map(value => this.listOfPlugs.push(value))
-    ).subscribe();
+    this.carsSuggestions = [];
+    this.cars = [];
   }
 
   onUserInputArray1($event: any) {
@@ -73,12 +64,33 @@ export class CalculComponent implements OnInit {
     );
   }
 
+  onUserCarsInput(event: any) {
+    event.preventDefault();
+    console.log('My List is ',this.carsSuggestions)
+    this.userCar = event.target.value;
+    this.vehiculesService.searchCars(event.target.value).subscribe(
+      (data: any) => {
+        data.data.vehicleList.forEach((element: any) => {
+          console.log('each cars ', { id: element.id, model: element.naming.model });
+          const car = { id: element.id, model: element.naming.model };
+          const isDuplicate = this.carsSuggestions.find(
+            (item) => item.id === car.id && item.model === car.model
+          );
+          if (!isDuplicate) {
+            this.carsSuggestions.push(car);
+          }
+        });
+      }
+    )
+  }
 
   onSubmitForm(form: { valid: any; }) {
+    const car = this.carsSuggestions.find((item) => item.model == this.userCar);
     if (form.valid) {
       zip(
         this.plugsService.getGeoCoding(this.startCity),
-        this.plugsService.getGeoCoding(this.endCity)
+        this.plugsService.getGeoCoding(this.endCity),
+        this.vehiculesService.findCarInfo(car?.id)
       ).pipe(
         tap(value => {
           const start = value[0];
@@ -88,9 +100,12 @@ export class CalculComponent implements OnInit {
           const waypoint2 = new L.LatLng(dest.lat, dest.lon);
 
           this.firstTraceRoute([waypoint1, waypoint2]);
+
+          this.autonomie = ~~value[2];
+          console.log('VALUE FROM PIPTAP',value[2])
+          this.soapCalcul.calculDuration(60,start.lat, start.lon, dest.lat, dest.lon, this.autonomie, 30)
         })
       ).subscribe();
-
     } else {
       console.log('Formulaire invalide');
     }
@@ -178,3 +193,4 @@ export class CalculComponent implements OnInit {
   }
 
 }
+

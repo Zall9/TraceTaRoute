@@ -1,25 +1,33 @@
 <article class="calculation--container" aria-label="">
-
   <form #f="ngForm" (ngSubmit)="onSubmitForm(f)" class="form--search--journey">
     <div class="grid">
+
+      <label class="form--search--journey-label" for="carsSuggestions">
+        Modele de vehicule
+        <datalist id="carsSuggestions">
+          <option *ngFor="let car of carsSuggestions">{{car.model}}</option>
+        </datalist>
+        <input (input)="onUserCarsInput($event)" type="search" autoComplete="on" list="carsSuggestions" required  />
+      </label>
+
       <label class="form--search--journey-label" for="suggestions">
         Lieu de départ
         <datalist id="suggestions">
-          <option *ngFor="let place of this.placesSuggestions">{{place}}</option>
+          <option *ngFor="let place of placesSuggestions">{{place}}</option>
         </datalist>
-        <input (input)="onUserInputArray1($event)"  type="search" autoComplete="on" list="suggestions" />
+        <input (input)="onUserInputArray1($event)" type="search" autoComplete="on" list="suggestions" required/>
       </label>
 
       <label class="form--search--journey-label" for="suggestions2">
         Lieu d'arrivée
         <datalist id="suggestions2">
-          <option *ngFor="let place of this.placesSuggestions2">{{place}}</option>
+          <option *ngFor="let place of placesSuggestions2">{{place}}</option>
         </datalist>
-        <input (input)="onUserInputArray2($event)"  type="search" autoComplete="on" list="suggestions2"  />
+        <input (input)="onUserInputArray2($event)" type="search" autoComplete="on" list="suggestions2" required/>
       </label>
 
+      <button class="form--search--journey-submitButton" type="submit">🔍</button>
     </div>
-    <button class="form--search--journey-submitButton" type="submit">🔍</button>
   </form>
 
   <app-map [lat1]="lat1" [lat2]="lat2" [lon1]="lon1" [lon2]="lon2"></app-map>
