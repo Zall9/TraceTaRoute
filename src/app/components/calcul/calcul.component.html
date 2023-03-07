@@ -7,7 +7,7 @@
         <datalist id="carsSuggestions">
           <option *ngFor="let car of carsSuggestions">{{car.model}}</option>
         </datalist>
-        <input (input)="onUserCarsInput($event)" type="search" autoComplete="on" list="carsSuggestions" required  />
+        <input (input)="onUserCarsInput($event)" type="search" autoComplete="on" list="carsSuggestions" required/>
       </label>
 
       <label class="form--search--journey-label" for="suggestions">
@@ -34,5 +34,6 @@
   <div class="calculation--container--soap-result" *ngIf="resultat">
     <hr>
     <p>Temps de Trajet : {{ resultat }}</p>
+    <p>Prix du Trajet : {{price}}</p>
   </div>
 </article>

@@ -7,6 +7,7 @@ import {MapComponent} from "../map/map.component";
 import * as L from 'leaflet';
 import 'leaflet-routing-machine';
 import {VehiculesListService} from "../../services/vehicules-list.service";
+import {PriceServiceService} from "../../services/price-service.service";
 
 @Component({
   selector: 'app-calcul',
@@ -15,9 +16,10 @@ import {VehiculesListService} from "../../services/vehicules-list.service";
 })
 export class CalculComponent implements OnInit {
 
+  distanceTotale!: number;
   placesSuggestions!: any[];
   placesSuggestions2!: any[];
-  carsSuggestions!: {id:number,model:string}[];
+  carsSuggestions!: { id: number, model: string }[];
   startCity!: string;
   endCity!: string;
 
@@ -31,19 +33,23 @@ export class CalculComponent implements OnInit {
   coordinates!: any[];
 
   userCar!: string;
-  cars !: {id: number, model: string}[];
+  cars !: { id: number, model: string }[];
 
   pumpIcon = L.icon({
     iconUrl: 'assets/images/pump.png',
-    iconSize:     [38, 95], // size of the icon
-    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+    iconSize: [38, 95], // size of the icon
+    iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
     shadowAnchor: [4, 62],  // the same for the shadow
-    popupAnchor:  [-3, -76]
+    popupAnchor: [-3, -76]
   });
   autonomie!: number;
   @ViewChild(MapComponent) map!: MapComponent;
+  price: any;
 
-  constructor(private vehiculesService: VehiculesListService,private soapCalcul: SoapCalculService, private plugsService: ReloadPlugsService) {
+  constructor(private vehiculesService: VehiculesListService,
+              private soapCalcul: SoapCalculService,
+              private plugsService: ReloadPlugsService,
+              private priceService: PriceServiceService) {
   }
 
   ngOnInit(): void {
@@ -73,13 +79,13 @@ export class CalculComponent implements OnInit {
 
   onUserCarsInput(event: any) {
     event.preventDefault();
-    console.log('My List is ',this.carsSuggestions)
+    console.log('My List is ', this.carsSuggestions)
     this.userCar = event.target.value;
     this.vehiculesService.searchCars(event.target.value).subscribe(
       (data: any) => {
         data.data.vehicleList.forEach((element: any) => {
-          console.log('each cars ', { id: element.id, model: element.naming.model });
-          const car = { id: element.id, model: element.naming.model };
+          console.log('each cars ', {id: element.id, model: element.naming.model});
+          const car = {id: element.id, model: element.naming.model};
           const isDuplicate = this.carsSuggestions.find(
             (item) => item.id === car.id && item.model === car.model
           );
@@ -109,13 +115,14 @@ export class CalculComponent implements OnInit {
           this.firstTraceRoute([waypoint1, waypoint2]);
 
           this.autonomie = ~~value[2];
-          console.log('VALUE FROM PIPTAP',value[2])
-          this.soapCalcul.calculDuration(60,start.lat, start.lon, dest.lat, dest.lon, this.autonomie, 30)
+          console.log('VALUE FROM PIPTAP', value[2])
+          this.soapCalcul.calculDuration(60, start.lat, start.lon, dest.lat, dest.lon, this.autonomie, 30)
             .subscribe((data: any) => {
               this.resultat = data;
             });
         })
       ).subscribe();
+
     } else {
       console.log('Formulaire invalide');
     }
@@ -147,6 +154,7 @@ export class CalculComponent implements OnInit {
 
     routing.on('routesfound', (e) => {
       const distanceKm = e.routes[0].summary.totalDistance / 1000;
+      this.distanceTotale = distanceKm;
       const coords = e.routes[0].coordinates;
       const autonomyKm = this.autonomie;
 
@@ -177,9 +185,12 @@ export class CalculComponent implements OnInit {
             });
 
             newWaypoints.push(waypoints[1]);
-
             // trace new route and delete old route
             this.secondTraceRoute(newWaypoints, routing);
+            this.priceService.getPrices(this.distanceTotale)
+              .subscribe((data: any) => {
+                this.price = data;
+              });
           })
         ).subscribe();
       }

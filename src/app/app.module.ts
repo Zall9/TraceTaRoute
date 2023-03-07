@@ -35,8 +35,8 @@ import {InMemoryCache} from "@apollo/client/core";
             link: httpLink.create({
               uri: 'https://api.chargetrip.io/graphql',
               headers:new HttpHeaders({
-                'x-client-id': '5ed1175bad06853b3aa1e492',
-                'x-app-id':'623998b2c35130073829b2d2'
+                'x-client-id': '64073df55fdc57484bfc8ddc',
+                'x-app-id':'64073df55fdc57484bfc8dde'
               })
             }),
           },
