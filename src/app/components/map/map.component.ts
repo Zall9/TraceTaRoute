@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, Output} from '@angular/core';
+import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import * as L from 'leaflet';
 import 'leaflet-routing-machine';
 @Component({
@@ -13,7 +13,7 @@ export class MapComponent implements OnInit {
   @Input() lon1!: number;
   @Input() lon2!: number;
   @Output() map!: L.Map;
-
+  @ViewChild('map') mapRef!: ElementRef<HTMLDivElement>;
   constructor() {
   }
 
@@ -37,4 +37,6 @@ export class MapComponent implements OnInit {
 
   }
 
+  ngAfterViewInit() {
+  }
 }

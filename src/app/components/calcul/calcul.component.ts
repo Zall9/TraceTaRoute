@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, Renderer2, ViewChild} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {catchError, filter, map, Observable, repeatWhen, take, tap, zip} from 'rxjs';
 import {SoapCalculService} from 'src/app/services/soap-calcul.service';
@@ -44,12 +44,16 @@ export class CalculComponent implements OnInit {
   });
   autonomie!: number;
   @ViewChild(MapComponent) map!: MapComponent;
+  @ViewChild(MapComponent) mapElement!: MapComponent;
+
   price: any;
 
   constructor(private vehiculesService: VehiculesListService,
               private soapCalcul: SoapCalculService,
               private plugsService: ReloadPlugsService,
-              private priceService: PriceServiceService) {
+              private priceService: PriceServiceService,
+              private renderer: Renderer2
+  ) {
   }
 
   ngOnInit(): void {
@@ -191,9 +195,25 @@ export class CalculComponent implements OnInit {
               .subscribe((data: any) => {
                 this.price = data;
               });
+            const markers = this.mapElement.mapRef.nativeElement.childNodes[0].childNodes[3].childNodes
+            console.log('markers', markers)
+            markers.forEach((marker: any, index: number) => {
+              if (index == 0 || index == markers.length - 1) {
+                this.renderer.setStyle(marker, "background-color", 'transparent');
+                this.renderer.setStyle(marker, "border", 'none');
+                this.renderer.setStyle(marker, "content", 'url("assets/marker.svg")');
+
+              } else {
+                this.renderer.setStyle(marker, "content", 'url("assets/pump.png")');
+                this.renderer.setStyle(marker, "background-color", 'transparent');
+                this.renderer.setStyle(marker, "border", 'none');
+              }
+            })
+
           })
         ).subscribe();
       }
+
     });
   }
 
@@ -210,6 +230,7 @@ export class CalculComponent implements OnInit {
       const distanceKm = e.routes[0].summary.totalDistance / 1000;
 
       console.log('distanceKm : ' + distanceKm);
+
     })
   }
 
