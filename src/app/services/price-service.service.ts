@@ -10,7 +10,7 @@ export class PriceServiceService {
   constructor(private http: HttpClient) { }
 
   getPrices(kilometers:number):Observable<any> {
-    return this.http.get("http://localhost:5001/price/" + kilometers).pipe(
+    return this.http.get("https://backend-ttr.vercel.app/price/" + kilometers).pipe(
       tap((data) => console.log(data))
     );
   }
