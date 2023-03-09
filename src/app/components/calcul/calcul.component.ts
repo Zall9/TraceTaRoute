@@ -120,7 +120,7 @@ export class CalculComponent implements OnInit {
 
           this.autonomie = ~~value[2];
           console.log('VALUE FROM PIPTAP', value[2])
-          this.soapCalcul.calculDuration(start.lat, start.lon, dest.lat, dest.lon, 60,30,this.autonomie)
+          this.soapCalcul.calculDuration(60,start.lat, start.lon, dest.lat, dest.lon,this.autonomie,30)
             .subscribe((data: any) => {
               this.resultat = data;
             });
